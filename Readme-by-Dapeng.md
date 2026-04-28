@@ -82,7 +82,7 @@ This submission implements a complete Spring Boot-based store application that m
 
 ### Bug fixed:
 - Rename `OrderContollerTests.java` to `OrderControllerTests.java`
-- Change`descriptioon' to `description` in `OpenApi.yaml`
+- Change`descriptioon` to `description` in `OpenApi.yaml`
 
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
