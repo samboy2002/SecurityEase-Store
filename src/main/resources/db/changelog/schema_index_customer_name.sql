@@ -1,0 +1,1 @@
+CREATE INDEX "customer_name" on "public"."customer" ("name" ASC);

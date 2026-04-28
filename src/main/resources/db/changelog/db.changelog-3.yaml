@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-index-customer-name
+      author: "dapeng li"
+      changes:
+        - sqlFile:
+            path: db/changelog/schema_index_customer_name.sql

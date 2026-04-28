@@ -62,4 +62,32 @@ class CustomerControllerTests {
                 .andExpect(jsonPath("$..name").value("John Doe"));
         ;
     }
+
+    @Test
+    void testSearchCustomersByName() throws Exception {
+        when(customerRepository.findByNameContainingIgnoreCase("John")).thenReturn(List.of(customer));
+
+        mockMvc.perform(get("/customer?name=John"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$[0].name").value("John Doe"));
+    }
+
+    @Test
+    void testSearchCustomersByName_WithBlankString() throws Exception {
+        when(customerRepository.findAll()).thenReturn(List.of(customer));
+
+        mockMvc.perform(get("/customer?name=    "))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$..name").value("John Doe"));
+    }
+
+    @Test
+    void testSearchCustomersByName_NoResults() throws Exception {
+        when(customerRepository.findByNameContainingIgnoreCase("Alice")).thenReturn(List.of());
+
+        mockMvc.perform(get("/customer?name=Alice"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$").isArray())
+               .andExpect(jsonPath("$.length()").value(0));
+    }
 }

@@ -49,6 +49,21 @@ This submission implements a complete Spring Boot-based store application that m
 - **Endpoint**: `GET /order/{id}`
 - **Functionality**: Retrieves a single order by its ID, returning an `OrderDTO` with associated products.
 - **Error Handling**: Returns 404 if order not found.
-- **Unit Tests:**
-  - Add `testGetOrderById` in `OrderControllerTests` for retrieving an exist order.
-  - Add `testGetOrderById_OrderDoesNotExist_ReturnStatus404` in `OrderControllerTests` for error handling.
+- **Implementation:**
+  - Add new endpoint `GET /order/{id}`
+  - Add new unit tests for both the existence and non-existence orders.
+
+### Task 2: Find customers by name substring
+- **Endpoint**: `GET /customer?name={substring}`
+- **Functionality**: Performs case-insensitive substring search across any word in customer names (e.g., "John" matches "John Doe" or "Dr. John Smith").
+- **Implementation**:
+  - Create a new index on the column of `name` in `Customer` table.
+  - Add custom query method using `Spring Data` to support case-insensitive substring search.
+  - Update `GET /customer` endpoint to support optional `name` query parameter for case-insensitive substring search.
+  - Add new unit tests:
+    - For successful search
+    - For empty results
+    - For the query parameter with a blank value
+
+## Assumptions & Decisions
+- **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
