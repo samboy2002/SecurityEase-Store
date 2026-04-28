@@ -42,3 +42,13 @@ This submission implements a complete Spring Boot-based store application that m
    ```bash
    ./gradlew test
    ```
+
+## Implemented Features
+
+### Task 1: Get a specific order by ID
+- **Endpoint**: `GET /order/{id}`
+- **Functionality**: Retrieves a single order by its ID, returning an `OrderDTO` with associated products.
+- **Error Handling**: Returns 404 if order not found.
+- **Unit Tests:**
+  - Add `testGetOrderById` in `OrderControllerTests` for retrieving an exist order.
+  - Add `testGetOrderById_OrderDoesNotExist_ReturnStatus404` in `OrderControllerTests` for error handling.

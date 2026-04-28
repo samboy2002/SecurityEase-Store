@@ -79,4 +79,20 @@ class OrderControllerTests {
                 .andExpect(jsonPath("$..description").value("Test Order"))
                 .andExpect(jsonPath("$..customer.name").value("John Doe"));
     }
+
+    @Test
+    void testGetOrderById() throws Exception {
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        mockMvc.perform(get("/order/1"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$.description").value("Test Order"))
+               .andExpect(jsonPath("$.customer.name").value("John Doe"));
+    }
+
+    @Test
+    void testGetOrderById_OrderDoesNotExist_ReturnStatus404() throws Exception {
+        mockMvc.perform(get("/order/999"))
+               .andExpect(status().isNotFound());
+    }
 }
