@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5-data-product
+      author: Dapeng Li
+      changes:
+        - sqlFile:
+            path: db/changelog/data-product.sql

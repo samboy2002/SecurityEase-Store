@@ -30,7 +30,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     foreignKeyName: fk_order_product_order
-                    referencedTableName: order
+                    referencedTableName: "order"
                     referencedColumnNames: id
               - column:
                   name: product_id
