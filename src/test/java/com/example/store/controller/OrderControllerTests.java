@@ -2,6 +2,7 @@ package com.example.store.controller;
 
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
+import com.example.store.entity.Product;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
@@ -43,6 +44,9 @@ class OrderControllerTests {
     private CustomerRepository customerRepository;
 
     private Order order;
+
+    private Product product;
+
     private Customer customer;
 
     @BeforeEach
@@ -51,10 +55,15 @@ class OrderControllerTests {
         customer.setName("John Doe");
         customer.setId(1L);
 
+        product = new Product();
+        product.setDescription("Test Product");
+        product.setId(1L);
+
         order = new Order();
         order.setDescription("Test Order");
         order.setId(1L);
         order.setCustomer(customer);
+        order.setProducts(List.of(product));
     }
 
     @Test
@@ -75,9 +84,12 @@ class OrderControllerTests {
         when(orderRepository.findAllWithCustomers()).thenReturn(List.of(order));
 
         mockMvc.perform(get("/order"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..description").value("Test Order"))
-                .andExpect(jsonPath("$..customer.name").value("John Doe"));
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$[0].description").value("Test Order"))
+               .andExpect(jsonPath("$[0].customer.name").value("John Doe"))
+               .andExpect(jsonPath("$[0].products").isArray())
+               .andExpect(jsonPath("$[0].products[0].id").value(1L))
+               .andExpect(jsonPath("$[0].products[0].description").value("Test Product"));
     }
 
     @Test
@@ -87,11 +99,14 @@ class OrderControllerTests {
         mockMvc.perform(get("/order/1"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.description").value("Test Order"))
-               .andExpect(jsonPath("$.customer.name").value("John Doe"));
+               .andExpect(jsonPath("$.customer.name").value("John Doe"))
+               .andExpect(jsonPath("$.products").isArray())
+               .andExpect(jsonPath("$.products[0].id").value(1L))
+               .andExpect(jsonPath("$.products[0].description").value("Test Product"));
     }
 
     @Test
-    void testGetOrderById_OrderDoesNotExist_ReturnStatus404() throws Exception {
+    void testGetOrderById_WithInvalidedId_ReturnStatus404() throws Exception {
         when(orderRepository.findByIdWithCustomers(999L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/order/999"))

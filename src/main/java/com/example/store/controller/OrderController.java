@@ -29,8 +29,8 @@ public class OrderController {
     @GetMapping("/{id}")
     public OrderDTO getOrderById(@PathVariable long id) {
         return orderRepository.findByIdWithCustomers(id)
-                .map(orderMapper::orderToOrderDTO)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
+                              .map(orderMapper::orderToOrderDTO)
+                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
     }
 
     @PostMapping
