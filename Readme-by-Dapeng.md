@@ -70,8 +70,19 @@ This submission implements a complete Spring Boot-based store application that m
 - **Impact**: Reduced database queries from 51 (for 50 customers) to 1 for customer listings.
 - **Additional**: Added database index on `customer.name` for faster searches.
 
-### Other Improvements
+### Task 4: Products Management
+- **New Entity**: `Product` with ID and description.
+- **Relationship**: Many-to-many between Orders and Products (products can appear in multiple orders).
+- **Endpoints**:
+    - `POST /products` - Create a new product
+    - `GET /products` - Retrieve all products with their associated order IDs
+    - `GET /products/{id}` - Retrieve a specific product with its order IDs
+- **Integration**: Updated order endpoints to include product lists in responses.
+- **Database**: Added `product` table and `order_product` join table via Liquibase migration.
+
+### Bug fixed:
 - Rename `OrderContollerTests.java` to `OrderControllerTests.java`
+- Change`descriptioon' to `description` in `OpenApi.yaml`
 
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
