@@ -55,7 +55,7 @@ class CustomerControllerTests {
 
     @Test
     void testGetAllCustomers() throws Exception {
-        when(customerRepository.findAll()).thenReturn(List.of(customer));
+        when(customerRepository.findAllWithOrders()).thenReturn(List.of(customer));
 
         mockMvc.perform(get("/customer"))
                 .andExpect(status().isOk())
@@ -65,7 +65,7 @@ class CustomerControllerTests {
 
     @Test
     void testSearchCustomersByName() throws Exception {
-        when(customerRepository.findByNameContainingIgnoreCase("John")).thenReturn(List.of(customer));
+        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("John")).thenReturn(List.of(customer));
 
         mockMvc.perform(get("/customer?name=John"))
                .andExpect(status().isOk())
@@ -74,7 +74,7 @@ class CustomerControllerTests {
 
     @Test
     void testSearchCustomersByName_WithBlankString() throws Exception {
-        when(customerRepository.findAll()).thenReturn(List.of(customer));
+        when(customerRepository.findAllWithOrders()).thenReturn(List.of(customer));
 
         mockMvc.perform(get("/customer?name=    "))
                .andExpect(status().isOk())
@@ -83,7 +83,7 @@ class CustomerControllerTests {
 
     @Test
     void testSearchCustomersByName_NoResults() throws Exception {
-        when(customerRepository.findByNameContainingIgnoreCase("Alice")).thenReturn(List.of());
+        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("Alice")).thenReturn(List.of());
 
         mockMvc.perform(get("/customer?name=Alice"))
                .andExpect(status().isOk())

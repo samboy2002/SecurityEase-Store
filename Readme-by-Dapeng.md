@@ -57,13 +57,21 @@ This submission implements a complete Spring Boot-based store application that m
 - **Endpoint**: `GET /customer?name={substring}`
 - **Functionality**: Performs case-insensitive substring search across any word in customer names (e.g., "John" matches "John Doe" or "Dr. John Smith").
 - **Implementation**:
-  - Create a new index on the column of `name` in `Customer` table.
   - Add custom query method using `Spring Data` to support case-insensitive substring search.
   - Update `GET /customer` endpoint to support optional `name` query parameter for case-insensitive substring search.
   - Add new unit tests:
     - For successful search
     - For empty results
     - For the query parameter with a blank value
+
+### Task 3: Performance Optimisation
+- **Issue Identified**: N+1 query problem in GET endpoints due to lazy loading.
+- **Solution**: Implemented custom repository methods using `JOIN FETCH` to load related entities in a single query.
+- **Impact**: Reduced database queries from 51 (for 50 customers) to 1 for customer listings.
+- **Additional**: Added database index on `customer.name` for faster searches.
+
+### Other Improvements
+- Rename `OrderContollerTests.java` to `OrderControllerTests.java`
 
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.

@@ -23,10 +23,10 @@ public class CustomerController {
     @GetMapping
     public List<CustomerDTO> getAllCustomers(@RequestParam(required = false) String name) {
         if (name != null && !name.isBlank()) {
-            return customerMapper.customersToCustomerDTOs(customerRepository.findByNameContainingIgnoreCase(name));
+            return customerMapper.customersToCustomerDTOs(customerRepository.findByNameContainingIgnoreCaseWithOrders(name));
         }
 
-        return customerMapper.customersToCustomerDTOs(customerRepository.findAll());
+        return customerMapper.customersToCustomerDTOs(customerRepository.findAllWithOrders());
     }
 
     @PostMapping

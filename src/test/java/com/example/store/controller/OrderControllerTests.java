@@ -72,7 +72,7 @@ class OrderControllerTests {
 
     @Test
     void testGetOrder() throws Exception {
-        when(orderRepository.findAll()).thenReturn(List.of(order));
+        when(orderRepository.findAllWithCustomers()).thenReturn(List.of(order));
 
         mockMvc.perform(get("/order"))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ class OrderControllerTests {
 
     @Test
     void testGetOrderById() throws Exception {
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderRepository.findByIdWithCustomers(1L)).thenReturn(Optional.of(order));
 
         mockMvc.perform(get("/order/1"))
                .andExpect(status().isOk())
@@ -92,6 +92,8 @@ class OrderControllerTests {
 
     @Test
     void testGetOrderById_OrderDoesNotExist_ReturnStatus404() throws Exception {
+        when(orderRepository.findByIdWithCustomers(999L)).thenReturn(Optional.empty());
+
         mockMvc.perform(get("/order/999"))
                .andExpect(status().isNotFound());
     }

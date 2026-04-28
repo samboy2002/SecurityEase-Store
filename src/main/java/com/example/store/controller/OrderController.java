@@ -23,12 +23,12 @@ public class OrderController {
 
     @GetMapping
     public List<OrderDTO> getAllOrders() {
-        return orderMapper.ordersToOrderDTOs(orderRepository.findAll());
+        return orderMapper.ordersToOrderDTOs(orderRepository.findAllWithCustomers());
     }
 
     @GetMapping("/{id}")
     public OrderDTO getOrderById(@PathVariable long id) {
-        return orderRepository.findById(id)
+        return orderRepository.findByIdWithCustomers(id)
                 .map(orderMapper::orderToOrderDTO)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
     }
