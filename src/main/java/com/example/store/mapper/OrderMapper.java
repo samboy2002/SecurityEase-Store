@@ -2,9 +2,11 @@ package com.example.store.mapper;
 
 import com.example.store.dto.OrderCustomerDTO;
 import com.example.store.dto.OrderDTO;
+import com.example.store.dto.ProductOrderDTO;
 import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
 
+import com.example.store.entity.Product;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -16,4 +18,8 @@ public interface OrderMapper {
     List<OrderDTO> ordersToOrderDTOs(List<Order> orders);
 
     OrderCustomerDTO orderToOrderCustomerDTO(Customer customer);
+
+    ProductOrderDTO productToProductOrderDTO(Product product);
+
+    List<ProductOrderDTO> productsToProductOrderDTOs(List<Product> products);
 }
