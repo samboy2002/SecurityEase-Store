@@ -83,6 +83,9 @@ This submission implements a complete Spring Boot-based store application that m
 ### Bug fixed:
 - Rename `OrderContollerTests.java` to `OrderControllerTests.java`
 - Change`descriptioon` to `description` in `OpenApi.yaml`
+- **Error Handling**: Global exception handler with meaningful error responses
+- **Validation**: Added input validation with Bean Validation annotations
+- **Testing**: Added comprehensive unit tests for all new endpoints and optimizations
 
 ### Additional Improvements
 - **Service Layer**: Separated business logic into service classes

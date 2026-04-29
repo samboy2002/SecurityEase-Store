@@ -1,6 +1,7 @@
 package com.example.store.controller;
 
 import com.example.store.dto.CustomerDTO;
+import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,13 +56,31 @@ class CustomerControllerTests {
 
     @Test
     void testCreateCustomer() throws Exception {
-        when(customerService.createCustomer(customer)).thenReturn(customerDTO);
+        CustomerCreateRequest createRequest = new CustomerCreateRequest();
+        createRequest.setName("John Doe");
+
+        when(customerService.createCustomer(createRequest)).thenReturn(customerDTO);
 
         mockMvc.perform(post("/customer")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customer)))
+                        .content(objectMapper.writeValueAsString(createRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("John Doe"));
+    }
+
+    @Test
+    void testCreateCustomer_withBlankName() throws Exception {
+        CustomerCreateRequest createRequest = new CustomerCreateRequest();
+
+        when(customerService.createCustomer(createRequest)).thenReturn(customerDTO);
+
+        mockMvc.perform(post("/customer")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createRequest)))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.message").value("Validation failed"))
+               .andExpect(jsonPath("$.validationErrors[0]").value("name: Customer name cannot be blank"))
+               .andExpect(jsonPath("$.path").value("/customer"));
     }
 
     @Test

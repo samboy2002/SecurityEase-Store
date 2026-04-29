@@ -1,6 +1,7 @@
 package com.example.store.service;
 
 import com.example.store.dto.CustomerDTO;
+import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
@@ -21,10 +22,14 @@ public class CustomerService {
     private final CustomerMapper customerMapper;
 
     @Transactional
-    public CustomerDTO createCustomer(Customer customer) {
-        log.info("Creating a customer: {}", customer.getName());
+    public CustomerDTO createCustomer(CustomerCreateRequest request) {
+        log.info("Creating a customer: {}", request.getName());
 
-        return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+        Customer customer = new Customer();
+        customer.setName(request.getName());
+        Customer savedCustomer = customerRepository.save(customer);
+
+        return customerMapper.customerToCustomerDTO(savedCustomer);
     }
 
     public Page<CustomerDTO> getCustomers(String name, Pageable pageable) {

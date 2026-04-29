@@ -1,6 +1,7 @@
 package com.example.store.service;
 
 import com.example.store.dto.CustomerDTO;
+import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
@@ -17,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -48,10 +51,13 @@ class CustomerServiceTest {
     }
     @Test
     void testCreateCustomer() {
-        when(customerRepository.save(customer)).thenReturn(customer);
+        CustomerCreateRequest request = new CustomerCreateRequest();
+        request.setName("Jhon Doe");
+
+        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
         when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
 
-        CustomerDTO result = customerService.createCustomer(customer);
+        CustomerDTO result = customerService.createCustomer(request);
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("John Doe");

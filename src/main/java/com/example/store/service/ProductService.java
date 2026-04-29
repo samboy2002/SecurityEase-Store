@@ -1,6 +1,7 @@
 package com.example.store.service;
 
 import com.example.store.dto.ProductDTO;
+import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.entity.Product;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
@@ -23,10 +24,14 @@ public class ProductService {
     private final ProductMapper productMapper;
 
     @Transactional
-    public ProductDTO createProduct(Product product) {
-        log.info("Creating product: {}", product.getDescription());
+    public ProductDTO createProduct(ProductCreateRequest request) {
+        log.info("Creating product: {}", request.getDescription());
 
-        return productMapper.productToProductDTO(productRepository.save(product));
+        Product newProduct = new Product();
+        newProduct.setDescription(request.getDescription());
+        Product savedProduct = productRepository.save(newProduct);
+
+        return productMapper.productToProductDTO(savedProduct);
     }
 
     public Page<ProductDTO> getAllProducts(Pageable pageable) {
