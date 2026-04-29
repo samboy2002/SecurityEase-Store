@@ -84,5 +84,8 @@ This submission implements a complete Spring Boot-based store application that m
 - Rename `OrderContollerTests.java` to `OrderControllerTests.java`
 - Change`descriptioon` to `description` in `OpenApi.yaml`
 
+### Additional Improvements
+- **Service Layer**: Separated business logic into service classes
+
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
