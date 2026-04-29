@@ -1,6 +1,8 @@
 package com.example.store.service;
 
 import com.example.store.dto.OrderDTO;
+import com.example.store.dto.request.OrderCreateRequest;
+import com.example.store.entity.Customer;
 import com.example.store.entity.Order;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
@@ -10,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -25,9 +29,18 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     @Transactional
-    public OrderDTO createOrder(Order order) {
-        log.info("Creating order for customer: {}", order.getCustomer().getId());
-        return orderMapper.orderToOrderDTO(orderRepository.save(order));
+    public OrderDTO createOrder(OrderCreateRequest request) {
+        log.info("Creating order for customer: {}", request.getCustomerId());
+
+        Customer customer = customerRepository.findById(request.getCustomerId())
+                                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+
+        Order newOrder = new Order();
+        newOrder.setDescription(request.getDescription());
+        newOrder.setCustomer(customer);
+        Order savedOrder = orderRepository.save(newOrder);
+
+        return orderMapper.orderToOrderDTO(savedOrder);
     }
 
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
