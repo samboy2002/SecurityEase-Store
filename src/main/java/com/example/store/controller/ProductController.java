@@ -1,8 +1,9 @@
 package com.example.store.controller;
 
 import com.example.store.dto.ProductDTO;
-import com.example.store.entity.Product;
+import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductDTO createProduct(@RequestBody Product product) {
-        return productService.createProduct(product);
+    public ProductDTO createProduct(@Valid @RequestBody ProductCreateRequest request) {
+        return productService.createProduct(request);
     }
 }

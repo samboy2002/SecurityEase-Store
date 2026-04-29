@@ -1,6 +1,7 @@
 package com.example.store.service;
 
 import com.example.store.dto.ProductDTO;
+import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.entity.Product;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,10 +54,13 @@ class ProductServiceTest {
 
     @Test
     void testCreateProduct() {
-        when(productRepository.save(product)).thenReturn(product);
+        ProductCreateRequest request = new ProductCreateRequest();
+        request.setDescription("Test Product");
+
+        when(productRepository.save(any(Product.class))).thenReturn(product);
         when(productMapper.productToProductDTO(product)).thenReturn(productDTO);
 
-        ProductDTO result = productService.createProduct(product);
+        ProductDTO result = productService.createProduct(request);
 
         assertThat(result).isEqualTo(productDTO);
     }

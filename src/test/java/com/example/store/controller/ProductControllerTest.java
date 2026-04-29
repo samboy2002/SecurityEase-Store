@@ -1,6 +1,7 @@
 package com.example.store.controller;
 
 import com.example.store.dto.ProductDTO;
+import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,12 +49,29 @@ class ProductControllerTest {
 
     @Test
     void testCreateProduct() throws Exception {
-        when(productService.createProduct(any())).thenReturn(productDTO);
+        ProductCreateRequest request = new ProductCreateRequest();
+        request.setDescription("Test Product");
+
+        when(productService.createProduct(any(ProductCreateRequest.class))).thenReturn(productDTO);
 
         mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(productDTO)))
+                                         .content(objectMapper.writeValueAsString(request)))
                .andExpect(status().isCreated())
                .andExpect(jsonPath("$.description").value("Test Product"));
+    }
+
+    @Test
+    void testCreateProduct_withoutDescription() throws Exception {
+        ProductCreateRequest request = new ProductCreateRequest();
+
+        when(productService.createProduct(any(ProductCreateRequest.class))).thenReturn(productDTO);
+
+        mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON)
+                                         .content(objectMapper.writeValueAsString(request)))
+               .andExpect(status().isBadRequest())
+               .andExpect(jsonPath("$.message").value("Validation failed"))
+               .andExpect(jsonPath("$.validationErrors[0]").value("description: Product description cannot be blank"))
+               .andExpect(jsonPath("$.path").value("/products"));
     }
 
     @Test
