@@ -23,20 +23,11 @@ This submission implements a complete Spring Boot-based store application that m
 - **Endpoint**: `GET /order/{id}`
 - **Functionality**: Retrieves a single order by its ID, returning an `OrderDTO` with associated products.
 - **Error Handling**: Returns 404 if order not found.
-- **Implementation:**
-  - Add new endpoint `GET /order/{id}`
-  - Add new unit tests for both the existence and non-existence orders.
 
 ### Task 2: Find customers by name substring
 - **Endpoint**: `GET /customer?name={substring}`
 - **Functionality**: Performs case-insensitive substring search across any word in customer names (e.g., "John" matches "John Doe" or "Dr. John Smith").
-- **Implementation**:
-  - Add custom query method using `Spring Data` to support case-insensitive substring search.
-  - Update `GET /customer` endpoint to support optional `name` query parameter for case-insensitive substring search.
-  - Add new unit tests:
-    - For successful search
-    - For empty results
-    - For the query parameter with a blank value
+- **Implementation**: Add custom query method using `Spring Data` to support case-insensitive substring search.
 
 ### Task 3: Performance Optimisation
 - **Issue Identified**: N+1 query problem in GET endpoints due to lazy loading.
@@ -69,6 +60,14 @@ This submission implements a complete Spring Boot-based store application that m
   - Support automatic generation of OpenApi docs
   - Using annotations to document APIs makes api docs to be easy to maintain
 
+## Assumptions & Decisions
+- **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
+- **Products Relationship**: Many-to-many, as products can be shared across orders (inferred from requirement to return order IDs per product).
+- **Performance**: Utilised @EntityGraph for precision loading of associations; this avoids the "N+1 select problem" while maintaining LAZY fetching defaults to prevent over-fetching unrelated data.
+- **Data Constraints**: No unique constraints on product descriptions to allow flexibility.
+- **Deletion**: Products remain in database even if removed from orders; cascade deletion not implemented to preserve data integrity.
+- **Pagination**: Default page size of 20; can be overridden via query parameters.
+
 ## Running the Application
 
 1. **Start PostgreSQL**:
@@ -98,14 +97,6 @@ This submission implements a complete Spring Boot-based store application that m
    ```bash
    ./gradlew generateOpenApiDocs
    ```
-   
-## Assumptions & Decisions
-- **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
-- **Products Relationship**: Many-to-many, as products can be shared across orders (inferred from requirement to return order IDs per product).
-- **Performance**: Used JOIN FETCH for controlled loading; avoided EAGER fetching to prevent over-fetching unrelated data.
-- **Data Constraints**: No unique constraints on product descriptions to allow flexibility.
-- **Deletion**: Products remain in database even if removed from orders; cascade deletion not implemented to preserve data integrity.
-- **Pagination**: Default page size of 20; can be overridden via query parameters.
 
 ## API Endpoints
 
@@ -142,3 +133,24 @@ curl "http://localhost:8080/customer?name=john"
 # Get order with products
 curl http://localhost:8080/order/1
 ```
+
+## CI/CD Pipeline
+Implemented GitHub Actions workflow that:
+- Builds the application
+- Runs all tests
+- Generates JaCoCo coverage report
+- Builds and pushes Docker image to GitHub Container Registry
+- Requires 80% test coverage to pass
+
+## Performance Considerations
+- Optimized queries eliminate N+1 problems
+- Database indexes on searchable fields
+- Pagination prevents large result sets
+- Lazy loading used appropriately to avoid over-fetching
+
+## Future Enhancements
+- Implement caching for frequently accessed data
+- Add authentication and authorization
+- Implement soft deletes for data preservation
+- Add integration tests with TestContainers
+- Implement rate limiting for API endpoints
