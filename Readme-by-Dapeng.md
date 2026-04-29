@@ -86,6 +86,7 @@ This submission implements a complete Spring Boot-based store application that m
 
 ### Additional Improvements
 - **Service Layer**: Separated business logic into service classes
+- **Pagination**: Implemented pageable responses for large datasets
 
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
