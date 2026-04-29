@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3-index-customer-name
+      author: "dapeng li"
+      changes:
+        - createIndex:
+            tableName: customer
+            indexName: idx_customer_name
+            columns:
+              - column:
+                  name: name

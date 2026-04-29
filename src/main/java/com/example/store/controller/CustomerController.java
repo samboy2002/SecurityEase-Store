@@ -1,33 +1,39 @@
 package com.example.store.controller;
 
 import com.example.store.dto.CustomerDTO;
-import com.example.store.entity.Customer;
-import com.example.store.mapper.CustomerMapper;
-import com.example.store.repository.CustomerRepository;
+import com.example.store.dto.request.CustomerCreateRequest;
+import com.example.store.service.CustomerService;
+
+import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/customer")
 @RequiredArgsConstructor
+@Tag(name = "/customer", description = "Customer Management Operations")
 public class CustomerController {
 
-    private final CustomerRepository customerRepository;
-    private final CustomerMapper customerMapper;
+    private final CustomerService customerService;
 
+    @Operation(summary = "Get customers")
     @GetMapping
-    public List<CustomerDTO> getAllCustomers() {
-        return customerMapper.customersToCustomerDTOs(customerRepository.findAll());
+    public Page<CustomerDTO> getAllCustomers(@RequestParam(required = false) String name, Pageable pageable) {
+        return customerService.getCustomers(name, pageable);
     }
 
+    @Operation(summary = "Create a customer")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDTO createCustomer(@RequestBody Customer customer) {
-        return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+    public CustomerDTO createCustomer(@Valid @RequestBody CustomerCreateRequest request) {
+        return customerService.createCustomer(request);
     }
 }

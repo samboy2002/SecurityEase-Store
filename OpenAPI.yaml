@@ -1,178 +1,633 @@
-openapi: 3.0.0
-info:
-  title: store
-  version: '1.0'
-  description: A simple store
-  contact:
-    name: SecuritEase Dev
-    url: 'https://www.securitease.com'
-    email: internal@securitease.com
-  termsOfService: 'https://www.securitease.com'
-  license:
-    name: Apache 2.0
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.htm'
-servers:
-  - url: 'http://localhost:8080'
-    description: dev
-paths:
-  /order:
-    get:
-      summary: Get Orders
-      tags:
-        - store
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Order'
-      operationId: getOrders
-      description: Get all orders
-    post:
-      summary: Create Order
-      tags:
-        - store
-      responses:
-        '201':
-          description: Created
-      operationId: createOrder
-      description: Create a new order
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  format: int64
-                descriptioon:
-                  type: string
-  /customer:
-    get:
-      summary: Get Customers
-      tags:
-        - store
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Customer'
-      operationId: getCustomers
-      description: Get all customers
-    post:
-      summary: Create Customer
-      tags:
-        - store
-      responses:
-        '201':
-          description: Created
-      operationId: createCustomer
-      description: Create a new customer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  format: int64
-                name:
-                  type: string
-  /products:
-    get:
-      summary: Get Products
-      tags:
-        - store
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  description:
-                    type: string
-                  orders:
-                    type: array
-                    items:
-                      type: integer
-                      format: int64
-      operationId: getProducts
-      description: Get all products
-    post:
-      summary: Create Product
-      tags:
-        - store
-      responses:
-        '201':
-          description: Created
-      operationId: createProduct
-      description: Create a new product
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  format: int64
-                description:
-                  type: string
-                  x-stoplight:
-                    id: jbh0jzkonppv8
-components:
-  schemas:
-    Order:
-      title: Order
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        description:
-          type: string
-        customer:
-          type: object
-          properties:
-            id:
-              type: integer
-              format: int64
-            description:
-              type: string
-    Customer:
-      title: Customer
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-        orders:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                format: int64
-              description:
-                type: string
-                x-stoplight:
-                  id: mq08x82g95zl9
-tags:
-  - name: store
-    description: store operations
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "store",
+    "description": "A simple store",
+    "termsOfService": "https://www.securitease.com",
+    "contact": {
+      "name": "SecuritEase Dev",
+      "url": "https://www.securitease.com",
+      "email": "internal@securitease.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "dev"
+    }
+  ],
+  "tags": [
+    {
+      "name": "/products",
+      "description": "Product Management Operations"
+    },
+    {
+      "name": "/order",
+      "description": "Order Management Operations"
+    },
+    {
+      "name": "/customer",
+      "description": "Customer Management Operations"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "tags": [
+          "/products"
+        ],
+        "summary": "Get paginated products",
+        "operationId": "getAllProducts",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageProductDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "/products"
+        ],
+        "summary": "Create a product",
+        "operationId": "createProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "tags": [
+          "/order"
+        ],
+        "summary": "Get paginated orders",
+        "operationId": "getAllOrders",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOrderDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "/order"
+        ],
+        "summary": "Create a product",
+        "operationId": "createOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customer": {
+      "get": {
+        "tags": [
+          "/customer"
+        ],
+        "summary": "Get customers",
+        "operationId": "getAllCustomers",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageCustomerDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "/customer"
+        ],
+        "summary": "Create a customer",
+        "operationId": "createCustomer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": [
+          "/products"
+        ],
+        "summary": "Get product by ID",
+        "operationId": "getProductById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of a product",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        }
+      }
+    },
+    "/order/{id}": {
+      "get": {
+        "tags": [
+          "/order"
+        ],
+        "summary": "Get a order by ID",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieval a product successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductCreateRequest": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "description"
+        ]
+      },
+      "ProductDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          },
+          "orderIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "OrderCreateRequest": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "customerId",
+          "description"
+        ]
+      },
+      "OrderCustomerDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/OrderCustomerDTO"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductOrderDTO"
+            }
+          }
+        }
+      },
+      "ProductOrderDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "CustomerCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "CustomerDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerOrderDTO"
+            }
+          }
+        }
+      },
+      "CustomerOrderDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PageProductDTO": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductDTO"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageOrderDTO": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderDTO"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageCustomerDTO": {
+        "type": "object",
+        "properties": {
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDTO"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
