@@ -10,15 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +32,7 @@ class CustomerServiceTest {
 
     private Customer customer;
     private CustomerDTO customerDTO;
+    private Pageable pageable;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +43,8 @@ class CustomerServiceTest {
         customerDTO = new CustomerDTO();
         customerDTO.setName("John Doe");
         customerDTO.setId(1L);
+
+        pageable = PageRequest.of(0, 20);
     }
     @Test
     void testCreateCustomer() {
@@ -56,34 +59,56 @@ class CustomerServiceTest {
 
     @Test
     void testGetCustomers_withoutName() {
-        when(customerRepository.findAllWithOrders()).thenReturn(List.of(customer));
-        when(customerMapper.customersToCustomerDTOs(List.of(customer))).thenReturn(List.of(customerDTO));
+        Page<Customer> page = new PageImpl<>(List.of(customer), pageable, 1);
+        when(customerRepository.findAllWithOrders(pageable)).thenReturn(page);
+        when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
 
-        List<CustomerDTO> results = customerService.getCustomers(null);
+        Page<CustomerDTO> results = customerService.getCustomers(null, pageable);
 
         assertThat(results).isNotEmpty();
-        assertThat(results).containsExactly(customerDTO);
+        assertThat(results.getTotalElements()).isEqualTo(1);
+        assertThat(results.getContent()).containsExactly(customerDTO);
+    }
+
+    @Test
+    void testGetCustomers_withoutNameAndUnpaged() {
+        Page<Customer> page = new PageImpl<>(List.of(customer), pageable, 1);
+
+        when(customerRepository.findAllWithOrders(pageable)).thenReturn(page);
+        when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
+
+        Page<CustomerDTO> results = customerService.getCustomers(null, Pageable.unpaged());
+
+        assertThat(results).isNotEmpty();
+        assertThat(results.getTotalElements()).isEqualTo(1);
+        assertThat(results.getContent()).containsExactly(customerDTO);
     }
 
     @Test
     void testGetCustomers_withName() {
-        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("John")).thenReturn(List.of(customer));
-        when(customerMapper.customersToCustomerDTOs(List.of(customer))).thenReturn(List.of(customerDTO));
+        Page<Customer> page = new PageImpl<>(List.of(customer), pageable, 1);
 
-        List<CustomerDTO> results = customerService.getCustomers("John");
+        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("John", pageable)).thenReturn(page);
+        when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
+
+        Page<CustomerDTO> results = customerService.getCustomers("John", pageable);
 
         assertThat(results).isNotEmpty();
-        assertThat(results).containsExactly(customerDTO);
+        assertThat(results.getTotalElements()).isEqualTo(1);
+        assertThat(results.getContent()).containsExactly(customerDTO);
     }
 
     @Test
     void testGetCustomers_withBlankName() {
-        when(customerRepository.findAllWithOrders()).thenReturn(List.of(customer));
-        when(customerMapper.customersToCustomerDTOs(List.of(customer))).thenReturn(List.of(customerDTO));
+        Page<Customer> page = new PageImpl<>(List.of(customer), pageable, 0);
 
-        List<CustomerDTO> results = customerService.getCustomers("    ");
+        when(customerRepository.findAllWithOrders(pageable)).thenReturn(page);
+        when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
+
+        Page<CustomerDTO> results = customerService.getCustomers("    ", pageable);
 
         assertThat(results).isNotEmpty();
-        assertThat(results).containsExactly(customerDTO);
+        assertThat(results.getTotalElements()).isEqualTo(1);
+        assertThat(results.getContent()).containsExactly(customerDTO);
     }
 }
