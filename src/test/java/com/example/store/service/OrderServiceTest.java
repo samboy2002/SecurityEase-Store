@@ -13,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +42,7 @@ class OrderServiceTest {
     private OrderDTO orderDTO;
 
     private Customer customer;
+    private Pageable pageable;
 
     @BeforeEach
     void setUp() {
@@ -58,6 +63,8 @@ class OrderServiceTest {
         orderDTO.setId(1L);
         orderDTO.setDescription("Sample Order");
         orderDTO.setCustomer(customerDTO);
+
+        pageable = PageRequest.of(0, 20);
     }
 
     @Test
@@ -72,13 +79,28 @@ class OrderServiceTest {
 
     @Test
     void testGetAllOrders() {
-        when(orderRepository.findAllWithCustomers()).thenReturn(List.of(order));
-        when(orderMapper.ordersToOrderDTOs(List.of(order))).thenReturn(List.of(orderDTO));
+        Page<Order> page = new PageImpl<>(List.of(order), pageable, 1);
 
-        List<OrderDTO> results = orderService.getAllOrders();
+        when(orderRepository.findAllWithCustomers(pageable)).thenReturn(page);
+        when(orderMapper.orderToOrderDTO(order)).thenReturn(orderDTO);
+
+        Page<OrderDTO> results = orderService.getAllOrders(pageable);
 
         assertThat(results).isNotEmpty();
-        assertThat(results).containsExactly(orderDTO);
+        assertThat(results.getContent()).containsExactly(orderDTO);
+    }
+
+    @Test
+    void testGetAllOrders_unpaged() {
+        Page<Order> page = new PageImpl<>(List.of(order), pageable, 1);
+
+        when(orderRepository.findAllWithCustomers(pageable)).thenReturn(page);
+        when(orderMapper.orderToOrderDTO(order)).thenReturn(orderDTO);
+
+        Page<OrderDTO> results = orderService.getAllOrders(Pageable.unpaged());
+
+        assertThat(results).isNotEmpty();
+        assertThat(results.getContent()).containsExactly(orderDTO);
     }
 
     @Test

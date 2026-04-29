@@ -7,12 +7,12 @@ import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -30,11 +30,16 @@ public class OrderService {
         return orderMapper.orderToOrderDTO(orderRepository.save(order));
     }
 
-    public List<OrderDTO> getAllOrders() {
-        log.debug("Fetching all orders.");
-        List<Order> orders = orderRepository.findAllWithCustomers();
+    public Page<OrderDTO> getAllOrders(Pageable pageable) {
+        log.debug("Fetching all orders with pagination: {}", pageable);
 
-        return orderMapper.ordersToOrderDTOs(orders);
+        if (pageable.isUnpaged()) {
+            pageable = PageRequest.of(0, 20);
+        }
+
+        Page<Order> orders = orderRepository.findAllWithCustomers(pageable);
+
+        return orders.map(orderMapper::orderToOrderDTO);
     }
 
     public Optional<OrderDTO> getOrderById(Long id) {

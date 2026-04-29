@@ -2,14 +2,16 @@ package com.example.store.controller;
 
 import com.example.store.dto.CustomerDTO;
 import com.example.store.entity.Customer;
-import com.example.store.mapper.CustomerMapper;
 import com.example.store.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +38,7 @@ class CustomerControllerTests {
 
     private Customer customer;
     private CustomerDTO customerDTO;
+    private Pageable pageable;
 
     @BeforeEach
     void setUp() {
@@ -46,6 +49,8 @@ class CustomerControllerTests {
         customerDTO = new CustomerDTO();
         customerDTO.setName("John Doe");
         customerDTO.setId(1L);
+
+        pageable = PageRequest.of(0, 20);
     }
 
     @Test
@@ -61,7 +66,9 @@ class CustomerControllerTests {
 
     @Test
     void testGetAllCustomers() throws Exception {
-        when(customerService.getCustomers(null)).thenReturn(List.of(customerDTO));
+        Page<CustomerDTO> page = new PageImpl<>(List.of(customerDTO), pageable, 1);
+
+        when(customerService.getCustomers(null, pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer"))
                 .andExpect(status().isOk())
@@ -71,16 +78,20 @@ class CustomerControllerTests {
 
     @Test
     void testSearchCustomersByName() throws Exception {
-        when(customerService.getCustomers("John")).thenReturn(List.of(customerDTO));
+        Page<CustomerDTO> page = new PageImpl<>(List.of(customerDTO), pageable, 1);
+
+        when(customerService.getCustomers("John", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=John"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].name").value("John Doe"));
+               .andExpect(jsonPath("$.content[0].name").value("John Doe"));
     }
 
     @Test
     void testSearchCustomersByName_withBlankString() throws Exception {
-        when(customerService.getCustomers("    ")).thenReturn(List.of(customerDTO));
+        Page<CustomerDTO> page = new PageImpl<>(List.of(customerDTO), pageable, 1);
+
+        when(customerService.getCustomers("    ", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=    "))
                .andExpect(status().isOk())
@@ -89,11 +100,13 @@ class CustomerControllerTests {
 
     @Test
     void testSearchCustomersByName_noResults() throws Exception {
-        when(customerService.getCustomers("Alice")).thenReturn(List.of());
+        Page<CustomerDTO> page = new PageImpl<>(List.of(), pageable, 0);
+
+        when(customerService.getCustomers("Alice", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=Alice"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$").isArray())
-               .andExpect(jsonPath("$.length()").value(0));
+               .andExpect(jsonPath("$.content").isArray())
+               .andExpect(jsonPath("$.content.length()").value(0));
     }
 }

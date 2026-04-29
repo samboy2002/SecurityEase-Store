@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -73,15 +77,18 @@ class OrderControllerTests {
 
     @Test
     void testGetOrder() throws Exception {
-        when(orderService.getAllOrders()).thenReturn(List.of(orderDTO));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<OrderDTO> page = new PageImpl<>(List.of(orderDTO), pageable, 1);
+
+        when(orderService.getAllOrders(pageable)).thenReturn(page);
 
         mockMvc.perform(get("/order"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$[0].description").value("Test Order"))
-               .andExpect(jsonPath("$[0].customer.name").value("John Doe"))
-               .andExpect(jsonPath("$[0].products").isArray())
-               .andExpect(jsonPath("$[0].products[0].id").value(1L))
-               .andExpect(jsonPath("$[0].products[0].description").value("Test Product"));
+               .andExpect(jsonPath("$.content[0].description").value("Test Order"))
+               .andExpect(jsonPath("$.content[0].customer.name").value("John Doe"))
+               .andExpect(jsonPath("$.content[0].products").isArray())
+               .andExpect(jsonPath("$.content[0].products[0].id").value(1L))
+               .andExpect(jsonPath("$.content[0].products[0].description").value("Test Product"));
     }
 
     @Test

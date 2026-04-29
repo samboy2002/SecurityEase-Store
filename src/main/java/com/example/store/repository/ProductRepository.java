@@ -1,16 +1,20 @@
 package com.example.store.repository;
 
 import com.example.store.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query("select p from Product p left join fetch p.orders")
-    List<Product> findAllWithOrders();
+    @EntityGraph(attributePaths = {"orders"})
+    @Query("select p from Product p")
+    Page<Product> findAllWithOrders(Pageable pageable);
 
-    @Query("select p from Product p left join fetch p.orders where p.id = :id")
+    @EntityGraph(attributePaths = {"orders"})
+    @Query("select p from Product p where p.id = :id")
     Optional<Product> findByIdWithOrders(Long id);
 }

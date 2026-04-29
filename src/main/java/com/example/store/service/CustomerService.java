@@ -6,10 +6,11 @@ import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -26,16 +27,20 @@ public class CustomerService {
         return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 
-    public List<CustomerDTO> getCustomers(String name) {
-        log.debug("Fetching customers with name filter: {}", name);
+    public Page<CustomerDTO> getCustomers(String name, Pageable pageable) {
+        log.debug("Fetching customers with name filter: {}, pagination: {}", name, pageable);
 
-        List<Customer> customers;
-        if (name != null && !name.isBlank()) {
-            customers = customerRepository.findByNameContainingIgnoreCaseWithOrders(name);
-        } else {
-            customers = customerRepository.findAllWithOrders();
+        if (pageable.isUnpaged()) {
+            pageable = PageRequest.of(0, 20);
         }
 
-        return customerMapper.customersToCustomerDTOs(customers);
+        Page<Customer> customers;
+        if (name != null && !name.isBlank()) {
+            customers = customerRepository.findByNameContainingIgnoreCaseWithOrders(name, pageable);
+        } else {
+            customers = customerRepository.findAllWithOrders(pageable);
+        }
+
+        return customers.map(customerMapper::customerToCustomerDTO);
     }
 }

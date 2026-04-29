@@ -6,10 +6,12 @@ import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -27,12 +29,16 @@ public class ProductService {
         return productMapper.productToProductDTO(productRepository.save(product));
     }
 
-    public List<ProductDTO> getAllProducts() {
-        log.debug("Fetching all products.");
+    public Page<ProductDTO> getAllProducts(Pageable pageable) {
+        log.debug("Fetching all products with pagination: {}", pageable);
 
-        List<Product> products = productRepository.findAllWithOrders();
+        if (pageable.isUnpaged()) {
+            pageable = PageRequest.of(0, 20);
+        }
 
-        return productMapper.productsToProductDTOs(products);
+        Page<Product> products = productRepository.findAllWithOrders(pageable);
+
+        return products.map(productMapper::productToProductDTO);
     }
 
     public Optional<ProductDTO> getProductById(Long id) {

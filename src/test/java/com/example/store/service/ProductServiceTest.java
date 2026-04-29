@@ -10,13 +10,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -31,6 +34,7 @@ class ProductServiceTest {
 
     private Product product;
     private ProductDTO productDTO;
+    private Pageable pageable;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +46,8 @@ class ProductServiceTest {
         productDTO.setId(1L);
         productDTO.setDescription("Test Product");
         productDTO.setOrderIds(List.of());
+
+        pageable = PageRequest.of(0, 20);
     }
 
     @Test
@@ -56,12 +62,26 @@ class ProductServiceTest {
 
     @Test
     void testGetAllProducts() {
-        when(productRepository.findAllWithOrders()).thenReturn(List.of(product));
-        when(productMapper.productsToProductDTOs(List.of(product))).thenReturn(List.of(productDTO));
+        Page<Product> page = new PageImpl<>(List.of(product), pageable, 1);
 
-        List<ProductDTO> results = productService.getAllProducts();
+        when(productRepository.findAllWithOrders(pageable)).thenReturn(page);
+        when(productMapper.productToProductDTO(product)).thenReturn(productDTO);
+
+        Page<ProductDTO> results = productService.getAllProducts(pageable);
         assertThat(results).isNotEmpty();
-        assertThat(results).containsExactly(productDTO);
+        assertThat(results.getContent()).containsExactly(productDTO);
+    }
+
+    @Test
+    void testGetAllProducts_unpaged() {
+        Page<Product> page = new PageImpl<>(List.of(product), pageable, 1);
+
+        when(productRepository.findAllWithOrders(pageable)).thenReturn(page);
+        when(productMapper.productToProductDTO(product)).thenReturn(productDTO);
+
+        Page<ProductDTO> results = productService.getAllProducts(Pageable.unpaged());
+        assertThat(results).isNotEmpty();
+        assertThat(results.getContent()).containsExactly(productDTO);
     }
 
     @Test
