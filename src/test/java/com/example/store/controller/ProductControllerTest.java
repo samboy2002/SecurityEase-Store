@@ -1,8 +1,10 @@
 package com.example.store.controller;
 
+import com.example.store.dto.ProductDTO;
 import com.example.store.entity.Product;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
+import com.example.store.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +18,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
-@ComponentScan(basePackageClasses = ProductMapper.class)
 class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -30,30 +32,31 @@ class ProductControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private ProductRepository productRepository;
+    private ProductService productService;
 
-    private Product product;
+    private ProductDTO productDTO;
 
     @BeforeEach
     void setUp() {
-        product = new Product();
-        product.setId(1L);
-        product.setDescription("Test Product");
+        productDTO = new ProductDTO();
+        productDTO.setDescription("Test Product");
+        productDTO.setId(1L);
+        productDTO.setOrderIds(List.of());
     }
 
     @Test
     void testCreateProduct() throws Exception {
-        when(productRepository.save(product)).thenReturn(product);
+        when(productService.createProduct(any())).thenReturn(productDTO);
 
         mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(product)))
+                                         .content(objectMapper.writeValueAsString(productDTO)))
                .andExpect(status().isCreated())
                .andExpect(jsonPath("$.description").value("Test Product"));
     }
 
     @Test
     void testGetAllProducts() throws Exception {
-        when(productRepository.findAllWithOrders()).thenReturn(List.of(product));
+        when(productService.getAllProducts()).thenReturn(List.of(productDTO));
 
         mockMvc.perform(get("/products"))
                .andExpect(status().isOk())
@@ -62,7 +65,7 @@ class ProductControllerTest {
 
     @Test
     void testGetProductById() throws Exception {
-        when(productRepository.findByIdWithOrders(1L)).thenReturn(Optional.of(product));
+        when(productService.getProductById(1L)).thenReturn(Optional.of(productDTO));
 
         mockMvc.perform(get("/products/1"))
                .andExpect(status().isOk())
@@ -71,7 +74,7 @@ class ProductControllerTest {
 
     @Test
     void testGetProductById_WithInvalidedId_ReturnStatusCode404() throws Exception {
-        when(productRepository.findByIdWithOrders(999L)).thenReturn(Optional.empty());
+        when(productService.getProductById(999L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/products/999"))
                .andExpect(status().isNotFound());

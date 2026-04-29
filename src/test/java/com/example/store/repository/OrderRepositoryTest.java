@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -23,22 +23,22 @@ class OrderRepositoryTest {
     @Test
     void findAllWithCustomers() {
         List<Order> results = orderRepository.findAllWithCustomers();
-        assertNotNull(results);
-        assertTrue(results.size() > 0);
+        assertThat(results).isNotNull();
+        assertThat(results).isNotEmpty();
 
-        results.forEach(o -> assertNotNull(o.getCustomer()));
+        results.forEach(o -> assertThat(o.getCustomer()).isNotNull());
     }
 
     @Test
     void findByIdWithCustomers() {
         Optional<Order> order = orderRepository.findByIdWithCustomers(1L);
-        assertTrue(order.isPresent());
-        assertNotNull(order.get().getCustomer());
+        assertThat(order).isPresent();
+        assertThat(order.get().getCustomer()).isNotNull();
     }
 
     @Test
     void findByIdWithCustomers_InvalidedId() {
         Optional<Order> order = orderRepository.findByIdWithCustomers(99999L);
-        assertFalse(order.isPresent());
+        assertThat(order).isNotPresent();
     }
 }

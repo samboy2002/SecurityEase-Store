@@ -2,8 +2,7 @@ package com.example.store.controller;
 
 import com.example.store.dto.ProductDTO;
 import com.example.store.entity.Product;
-import com.example.store.mapper.ProductMapper;
-import com.example.store.repository.ProductRepository;
+import com.example.store.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,26 +14,22 @@ import java.util.List;
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    private final ProductRepository productRepository;
-    private final ProductMapper productMapper;
+    private final ProductService productService;
 
     @GetMapping
     public List<ProductDTO> getAllProducts() {
-        return productRepository.findAllWithOrders().stream()
-                                .map(productMapper::productToProductDTO)
-                                .toList();
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
     public ProductDTO getProductById(@PathVariable Long id) {
-        return productRepository.findByIdWithOrders(id)
-                                .map(productMapper::productToProductDTO)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+        return productService.getProductById(id)
+                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDTO createProduct(@RequestBody Product product) {
-        return productMapper.productToProductDTO(productRepository.save(product));
+        return productService.createProduct(product);
     }
 }

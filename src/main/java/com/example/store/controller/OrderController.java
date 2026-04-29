@@ -5,6 +5,7 @@ import com.example.store.entity.Order;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.OrderRepository;
 
+import com.example.store.service.OrderService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -18,24 +19,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderRepository orderRepository;
-    private final OrderMapper orderMapper;
+    private final OrderService orderService;
 
     @GetMapping
     public List<OrderDTO> getAllOrders() {
-        return orderMapper.ordersToOrderDTOs(orderRepository.findAllWithCustomers());
+        return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
     public OrderDTO getOrderById(@PathVariable long id) {
-        return orderRepository.findByIdWithCustomers(id)
-                              .map(orderMapper::orderToOrderDTO)
-                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
+        return orderService.getOrderById(id)
+                           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderDTO createOrder(@RequestBody Order order) {
-        return orderMapper.orderToOrderDTO(orderRepository.save(order));
+        return orderService.createOrder(order);
     }
 }
