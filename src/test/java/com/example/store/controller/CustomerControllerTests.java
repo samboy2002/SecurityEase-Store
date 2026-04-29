@@ -80,7 +80,7 @@ class CustomerControllerTests {
     }
 
     @Test
-    void testSearchCustomersByName_WithBlankString() throws Exception {
+    void testSearchCustomersByName_withBlankString() throws Exception {
         when(customerService.getCustomers("    ")).thenReturn(List.of(customerDTO));
 
         mockMvc.perform(get("/customer?name=    "))
@@ -89,7 +89,7 @@ class CustomerControllerTests {
     }
 
     @Test
-    void testSearchCustomersByName_NoResults() throws Exception {
+    void testSearchCustomersByName_noResults() throws Exception {
         when(customerService.getCustomers("Alice")).thenReturn(List.of());
 
         mockMvc.perform(get("/customer?name=Alice"))

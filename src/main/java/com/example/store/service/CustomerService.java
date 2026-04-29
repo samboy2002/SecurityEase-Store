@@ -21,13 +21,13 @@ public class CustomerService {
 
     @Transactional
     public CustomerDTO createCustomer(Customer customer) {
-        log.info("Create a customer: {}", customer.getName());
+        log.info("Creating a customer: {}", customer.getName());
 
         return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 
     public List<CustomerDTO> getCustomers(String name) {
-        log.debug("Fetch customers with name filter: {}", name);
+        log.debug("Fetching customers with name filter: {}", name);
 
         List<Customer> customers;
         if (name != null && !name.isBlank()) {
