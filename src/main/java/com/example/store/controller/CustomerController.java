@@ -1,8 +1,10 @@
 package com.example.store.controller;
 
 import com.example.store.dto.CustomerDTO;
+import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +25,7 @@ public class CustomerController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerDTO createCustomer(@RequestBody Customer customer) {
-        return customerService.createCustomer(customer);
+    public CustomerDTO createCustomer(@Valid @RequestBody CustomerCreateRequest request) {
+        return customerService.createCustomer(request);
     }
 }
