@@ -8,6 +8,8 @@ import com.example.store.repository.OrderRepository;
 import com.example.store.service.OrderService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,8 +24,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public List<OrderDTO> getAllOrders() {
-        return orderService.getAllOrders();
+    public Page<OrderDTO> getAllOrders(Pageable pageable) {
+        return orderService.getAllOrders(pageable);
     }
 
     @GetMapping("/{id}")

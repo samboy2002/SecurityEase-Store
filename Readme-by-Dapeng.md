@@ -66,7 +66,7 @@ This submission implements a complete Spring Boot-based store application that m
 
 ### Task 3: Performance Optimisation
 - **Issue Identified**: N+1 query problem in GET endpoints due to lazy loading.
-- **Solution**: Implemented custom repository methods using `JOIN FETCH` to load related entities in a single query.
+- **Solution**: Implemented custom repository methods using `@EntityGraph` to ensures related entities are joined in the initial SQL query, so it doesn't execute a separate query for every entity in the list.
 - **Impact**: Reduced database queries from 51 (for 50 customers) to 1 for customer listings.
 - **Additional**: Added database index on `customer.name` for faster searches.
 
