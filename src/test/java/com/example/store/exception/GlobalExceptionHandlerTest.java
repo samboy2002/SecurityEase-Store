@@ -2,6 +2,7 @@ package com.example.store.exception;
 
 import com.example.store.controller.CustomerController;
 import com.example.store.service.CustomerService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,16 +27,15 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void getAllCustomers_whenUnexpectedExceptionOccur_return500() throws Exception {
-        when(customerService.getCustomers(any(), any()))
-                .thenThrow(new RuntimeException("Database connection lost"));
+        when(customerService.getCustomers(any(), any())).thenThrow(new RuntimeException("Database connection lost"));
 
         mockMvc.perform(get("/customer"))
-               .andExpect(status().isInternalServerError())
-               .andExpect(jsonPath("$.status").value(500))
-               .andExpect(jsonPath("$.error").value("500 INTERNAL_SERVER_ERROR"))
-               .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
-               .andExpect(jsonPath("$.path").value("/customer"))
-               .andExpect(jsonPath("$.timestamp").exists());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.error").value("500 INTERNAL_SERVER_ERROR"))
+                .andExpect(jsonPath("$.message").value("An unexpected error occurred"))
+                .andExpect(jsonPath("$.path").value("/customer"))
+                .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
@@ -45,10 +45,10 @@ class GlobalExceptionHandlerTest {
 
         // Act & Assert
         mockMvc.perform(get("/customer"))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.status").value(404))
-               .andExpect(jsonPath("$.error").value("404 NOT_FOUND"))
-               .andExpect(jsonPath("$.message").value("Customer not found"))
-               .andExpect(jsonPath("$.path").value("/customer"));
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("404 NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.path").value("/customer"));
     }
 }

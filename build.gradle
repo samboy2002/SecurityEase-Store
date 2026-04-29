@@ -77,3 +77,21 @@ tasks.jacocoTestReport {
         })
     }
 }
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn tasks.jacocoTestReport
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: ['**/mapper/**', '**/exception/**', '**/StoreApplication.class', '**/dto/**', '**/entity/**'])
+        })
+    }
+    violationRules {
+        rule {
+            element = 'PACKAGE'
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
+}

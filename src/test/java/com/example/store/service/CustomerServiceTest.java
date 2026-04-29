@@ -5,6 +5,7 @@ import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.repository.CustomerRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,18 +19,18 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
     @Mock
     private CustomerRepository customerRepository;
+
     @Mock
     private CustomerMapper customerMapper;
+
     @InjectMocks
     private CustomerService customerService;
 
@@ -49,6 +50,7 @@ class CustomerServiceTest {
 
         pageable = PageRequest.of(0, 20);
     }
+
     @Test
     void testCreateCustomer() {
         CustomerCreateRequest request = new CustomerCreateRequest();
@@ -94,7 +96,8 @@ class CustomerServiceTest {
     void testGetCustomers_withName() {
         Page<Customer> page = new PageImpl<>(List.of(customer), pageable, 1);
 
-        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("John", pageable)).thenReturn(page);
+        when(customerRepository.findByNameContainingIgnoreCaseWithOrders("John", pageable))
+                .thenReturn(page);
         when(customerMapper.customerToCustomerDTO(customer)).thenReturn(customerDTO);
 
         Page<CustomerDTO> results = customerService.getCustomers("John", pageable);

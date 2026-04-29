@@ -4,6 +4,7 @@ import com.example.store.dto.ProductDTO;
 import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,10 +55,11 @@ class ProductControllerTest {
 
         when(productService.createProduct(any(ProductCreateRequest.class))).thenReturn(productDTO);
 
-        mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isCreated())
-               .andExpect(jsonPath("$.description").value("Test Product"));
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.description").value("Test Product"));
     }
 
     @Test
@@ -66,12 +68,13 @@ class ProductControllerTest {
 
         when(productService.createProduct(any(ProductCreateRequest.class))).thenReturn(productDTO);
 
-        mockMvc.perform(post("/products").contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.message").value("Validation failed"))
-               .andExpect(jsonPath("$.validationErrors[0]").value("description: Product description cannot be blank"))
-               .andExpect(jsonPath("$.path").value("/products"));
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.validationErrors[0]").value("description: Product description cannot be blank"))
+                .andExpect(jsonPath("$.path").value("/products"));
     }
 
     @Test
@@ -82,8 +85,8 @@ class ProductControllerTest {
         when(productService.getAllProducts(pageable)).thenReturn(page);
 
         mockMvc.perform(get("/products"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content[0].description").value("Test Product"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].description").value("Test Product"));
     }
 
     @Test
@@ -91,15 +94,14 @@ class ProductControllerTest {
         when(productService.getProductById(1L)).thenReturn(Optional.of(productDTO));
 
         mockMvc.perform(get("/products/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.description").value("Test Product"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Test Product"));
     }
 
     @Test
     void testGetProductById_WithInvalidedId_ReturnStatusCode404() throws Exception {
         when(productService.getProductById(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/products/999"))
-               .andExpect(status().isNotFound());
+        mockMvc.perform(get("/products/999")).andExpect(status().isNotFound());
     }
 }

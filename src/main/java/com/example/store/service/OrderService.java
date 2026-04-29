@@ -7,8 +7,10 @@ import com.example.store.entity.Order;
 import com.example.store.mapper.OrderMapper;
 import com.example.store.repository.CustomerRepository;
 import com.example.store.repository.OrderRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +34,9 @@ public class OrderService {
     public OrderDTO createOrder(OrderCreateRequest request) {
         log.info("Creating order for customer: {}", request.getCustomerId());
 
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+        Customer customer = customerRepository
+                .findById(request.getCustomerId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
 
         Order newOrder = new Order();
         newOrder.setDescription(request.getDescription());
@@ -58,7 +61,6 @@ public class OrderService {
     public Optional<OrderDTO> getOrderById(Long id) {
         log.debug("Fetching order by id: {}", id);
 
-        return orderRepository.findByIdWithCustomers(id)
-                              .map(orderMapper::orderToOrderDTO);
+        return orderRepository.findByIdWithCustomers(id).map(orderMapper::orderToOrderDTO);
     }
 }

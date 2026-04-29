@@ -7,7 +7,9 @@ import com.example.store.dto.request.OrderCreateRequest;
 import com.example.store.mapper.CustomerMapper;
 import com.example.store.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,35 +85,35 @@ class OrderControllerTests {
     }
 
     @Test
-    void testCreateOrder_withoutDescription() throws Exception{
+    void testCreateOrder_withoutDescription() throws Exception {
         OrderCreateRequest request = new OrderCreateRequest();
         request.setCustomerId(1L);
 
         mockMvc.perform(post("/order")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.message").value("Validation failed"))
-               .andExpect(jsonPath("$.validationErrors[0]").value("description: Order description cannot be blank"))
-               .andExpect(jsonPath("$.path").value("/order"));
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.validationErrors[0]").value("description: Order description cannot be blank"))
+                .andExpect(jsonPath("$.path").value("/order"));
     }
 
     @Test
-    void testCreateOrder_withoutCustomerId() throws Exception{
+    void testCreateOrder_withoutCustomerId() throws Exception {
         OrderCreateRequest request = new OrderCreateRequest();
         request.setDescription("Sample Order");
 
         mockMvc.perform(post("/order")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.message").value("Validation failed"))
-               .andExpect(jsonPath("$.validationErrors[0]").value("customerId: Customer ID cannot be null"))
-               .andExpect(jsonPath("$.path").value("/order"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.validationErrors[0]").value("customerId: Customer ID cannot be null"))
+                .andExpect(jsonPath("$.path").value("/order"));
     }
 
     @Test
-    void testCreateOrder_withInvalidedCustomerId() throws Exception{
+    void testCreateOrder_withInvalidedCustomerId() throws Exception {
         OrderCreateRequest request = new OrderCreateRequest();
         request.setDescription("Sample Order");
         request.setCustomerId(999L);
@@ -120,11 +122,11 @@ class OrderControllerTests {
         when(orderService.createOrder(any(OrderCreateRequest.class))).thenThrow(exception);
 
         mockMvc.perform(post("/order")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-               .andExpect(status().isNotFound())
-               .andExpect(jsonPath("$.message").value("Customer not found"))
-               .andExpect(jsonPath("$.path").value("/order"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.path").value("/order"));
     }
 
     @Test
@@ -135,12 +137,12 @@ class OrderControllerTests {
         when(orderService.getAllOrders(pageable)).thenReturn(page);
 
         mockMvc.perform(get("/order"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content[0].description").value("Test Order"))
-               .andExpect(jsonPath("$.content[0].customer.name").value("John Doe"))
-               .andExpect(jsonPath("$.content[0].products").isArray())
-               .andExpect(jsonPath("$.content[0].products[0].id").value(1L))
-               .andExpect(jsonPath("$.content[0].products[0].description").value("Test Product"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].description").value("Test Order"))
+                .andExpect(jsonPath("$.content[0].customer.name").value("John Doe"))
+                .andExpect(jsonPath("$.content[0].products").isArray())
+                .andExpect(jsonPath("$.content[0].products[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].products[0].description").value("Test Product"));
     }
 
     @Test
@@ -148,19 +150,18 @@ class OrderControllerTests {
         when(orderService.getOrderById(1L)).thenReturn(Optional.of(orderDTO));
 
         mockMvc.perform(get("/order/1"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.description").value("Test Order"))
-               .andExpect(jsonPath("$.customer.name").value("John Doe"))
-               .andExpect(jsonPath("$.products").isArray())
-               .andExpect(jsonPath("$.products[0].id").value(1L))
-               .andExpect(jsonPath("$.products[0].description").value("Test Product"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.description").value("Test Order"))
+                .andExpect(jsonPath("$.customer.name").value("John Doe"))
+                .andExpect(jsonPath("$.products").isArray())
+                .andExpect(jsonPath("$.products[0].id").value(1L))
+                .andExpect(jsonPath("$.products[0].description").value("Test Product"));
     }
 
     @Test
     void testGetOrderById_withInvalidedId() throws Exception {
         when(orderService.getOrderById(999L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/order/999"))
-               .andExpect(status().isNotFound());
+        mockMvc.perform(get("/order/999")).andExpect(status().isNotFound());
     }
 }

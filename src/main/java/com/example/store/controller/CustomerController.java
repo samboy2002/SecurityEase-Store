@@ -3,14 +3,18 @@ package com.example.store.controller;
 import com.example.store.dto.CustomerDTO;
 import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.service.CustomerService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/customer")

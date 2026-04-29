@@ -5,8 +5,10 @@ import com.example.store.dto.request.ProductCreateRequest;
 import com.example.store.entity.Product;
 import com.example.store.mapper.ProductMapper;
 import com.example.store.repository.ProductRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +51,6 @@ public class ProductService {
     public Optional<ProductDTO> getProductById(Long id) {
         log.debug("Fetching product by id: {}", id);
 
-        return productRepository.findByIdWithOrders(id)
-                                .map(productMapper::productToProductDTO);
+        return productRepository.findByIdWithOrders(id).map(productMapper::productToProductDTO);
     }
 }

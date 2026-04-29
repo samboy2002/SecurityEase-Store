@@ -5,6 +5,7 @@ import com.example.store.dto.request.CustomerCreateRequest;
 import com.example.store.entity.Customer;
 import com.example.store.service.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,12 +76,12 @@ class CustomerControllerTests {
         when(customerService.createCustomer(createRequest)).thenReturn(customerDTO);
 
         mockMvc.perform(post("/customer")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(createRequest)))
-               .andExpect(status().isBadRequest())
-               .andExpect(jsonPath("$.message").value("Validation failed"))
-               .andExpect(jsonPath("$.validationErrors[0]").value("name: Customer name cannot be blank"))
-               .andExpect(jsonPath("$.path").value("/customer"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.validationErrors[0]").value("name: Customer name cannot be blank"))
+                .andExpect(jsonPath("$.path").value("/customer"));
     }
 
     @Test
@@ -102,8 +103,8 @@ class CustomerControllerTests {
         when(customerService.getCustomers("John", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=John"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content[0].name").value("John Doe"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("John Doe"));
     }
 
     @Test
@@ -113,8 +114,8 @@ class CustomerControllerTests {
         when(customerService.getCustomers("    ", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=    "))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$..name").value("John Doe"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..name").value("John Doe"));
     }
 
     @Test
@@ -124,8 +125,8 @@ class CustomerControllerTests {
         when(customerService.getCustomers("Alice", pageable)).thenReturn(page);
 
         mockMvc.perform(get("/customer?name=Alice"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.content").isArray())
-               .andExpect(jsonPath("$.content.length()").value(0));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 }
