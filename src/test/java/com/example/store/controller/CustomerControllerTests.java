@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
-@ComponentScan(basePackageClasses = CustomerMapper.class)
 class CustomerControllerTests {
 
     @Autowired

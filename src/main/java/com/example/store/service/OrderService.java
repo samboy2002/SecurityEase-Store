@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,11 +37,10 @@ public class OrderService {
         return orderMapper.ordersToOrderDTOs(orders);
     }
 
-    public OrderDTO getOrderById(Long id) {
+    public Optional<OrderDTO> getOrderById(Long id) {
         log.debug("Fetching order by id: {}", id);
 
         return orderRepository.findByIdWithCustomers(id)
-                              .map(orderMapper::orderToOrderDTO)
-                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
+                              .map(orderMapper::orderToOrderDTO);
     }
 }

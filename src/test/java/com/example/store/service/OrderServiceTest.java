@@ -13,15 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -89,17 +86,17 @@ class OrderServiceTest {
         when(orderRepository.findByIdWithCustomers(1L)).thenReturn(Optional.of(order));
         when(orderMapper.orderToOrderDTO(order)).thenReturn(orderDTO);
 
-        OrderDTO result = orderService.getOrderById(1L);
+        Optional<OrderDTO> result = orderService.getOrderById(1L);
 
-        assertThat(result).isEqualTo(orderDTO);
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(orderDTO);
     }
 
     @Test
     void testGetOrderById_withInvalidedId() {
         when(orderRepository.findByIdWithCustomers(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> orderService.getOrderById(999L))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasMessageContaining("Order not found");
+        Optional<OrderDTO> result = orderService.getOrderById(999L);
+        assertThat(result).isNotPresent();
     }
 }

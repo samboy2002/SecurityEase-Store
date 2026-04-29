@@ -28,7 +28,8 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public OrderDTO getOrderById(@PathVariable long id) {
-        return orderService.getOrderById(id);
+        return orderService.getOrderById(id)
+                           .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
     }
 
     @PostMapping

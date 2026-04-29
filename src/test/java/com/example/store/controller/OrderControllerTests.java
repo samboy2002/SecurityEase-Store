@@ -12,11 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +86,7 @@ class OrderControllerTests {
 
     @Test
     void testGetOrderById() throws Exception {
-        when(orderService.getOrderById(1L)).thenReturn(orderDTO);
+        when(orderService.getOrderById(1L)).thenReturn(Optional.of(orderDTO));
 
         mockMvc.perform(get("/order/1"))
                .andExpect(status().isOk())
@@ -101,8 +99,7 @@ class OrderControllerTests {
 
     @Test
     void testGetOrderById_withInvalidedId() throws Exception {
-        ResponseStatusException exception = new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found.");
-        when(orderService.getOrderById(999L)).thenThrow(exception);
+        when(orderService.getOrderById(999L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/order/999"))
                .andExpect(status().isNotFound());
