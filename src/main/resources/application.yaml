@@ -13,3 +13,7 @@ spring:
         default_batch_fetch_size: 10
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+  springdoc:
+    swagger-ui:
+      operationsSorter: alpha
+      tagsSorter: alpha

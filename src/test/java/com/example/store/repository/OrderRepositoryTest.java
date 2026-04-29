@@ -29,7 +29,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void findAllWithCustomers() {
+    void testFindAllWithCustomers() {
         Page<Order> results = orderRepository.findAllWithCustomers(pageable);
         assertThat(results).isNotEmpty();
 
@@ -37,14 +37,14 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void findByIdWithCustomers() {
+    void testFindByIdWithCustomers() {
         Optional<Order> order = orderRepository.findByIdWithCustomers(1L);
         assertThat(order).isPresent();
         assertThat(order.get().getCustomer()).isNotNull();
     }
 
     @Test
-    void findByIdWithCustomers_InvalidedId() {
+    void testFindByIdWithCustomers_InvalidedId() {
         Optional<Order> order = orderRepository.findByIdWithCustomers(99999L);
         assertThat(order).isNotPresent();
     }

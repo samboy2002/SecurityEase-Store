@@ -17,32 +17,6 @@ This submission implements a complete Spring Boot-based store application that m
 - Docker (for PostgreSQL)
 - Gradle 8.5+
 
-## Running the Application
-
-1. **Start PostgreSQL**:
-   ```bash
-   docker run -d \
-     --name postgres \
-     --restart always \
-     -e POSTGRES_USER=admin \
-     -e POSTGRES_PASSWORD=admin \
-     -e POSTGRES_DB=store \
-     -v postgres:/var/lib/postgresql/data \
-     -p 5433:5432 \
-     postgres:16.2 \
-     postgres -c wal_level=logical
-   ```
-
-2. **Run the Application**:
-   ```bash
-   ./gradlew bootRun
-   ```
-
-3. **Run Tests**:
-   ```bash
-   ./gradlew test
-   ```
-
 ## Implemented Features
 
 ### Task 1: Get a specific order by ID
@@ -83,13 +57,88 @@ This submission implements a complete Spring Boot-based store application that m
 ### Bug fixed:
 - Rename `OrderContollerTests.java` to `OrderControllerTests.java`
 - Change`descriptioon` to `description` in `OpenApi.yaml`
-- **Error Handling**: Global exception handler with meaningful error responses
-- **Validation**: Added input validation with Bean Validation annotations
-- **Testing**: Added comprehensive unit tests for all new endpoints and optimizations
+- Fixed "Duplicate Key" errors when creating a new entity by updating sequences to the max(id)
 
 ### Additional Improvements
 - **Service Layer**: Separated business logic into service classes
 - **Pagination**: Implemented pageable responses for large datasets
+- **Error Handling**: Global exception handler with meaningful error responses
+- **Validation**: Added input validation with Bean Validation annotations
+- **Testing**: Added comprehensive unit tests for all new endpoints and optimizations
+- **OpenAPI**: Updated specification with new endpoints and fixed typos
+  - Support automatic generation of OpenApi docs
+  - Using annotations to document APIs makes api docs to be easy to maintain
 
+## Running the Application
+
+1. **Start PostgreSQL**:
+   ```bash
+   docker run -d \
+     --name postgres \
+     --restart always \
+     -e POSTGRES_USER=admin \
+     -e POSTGRES_PASSWORD=admin \
+     -e POSTGRES_DB=store \
+     -v postgres:/var/lib/postgresql/data \
+     -p 5433:5432 \
+     postgres:16.2 \
+     postgres -c wal_level=logical
+   ```
+
+2. **Run the Application**:
+   ```bash
+   ./gradlew bootRun
+   ```
+
+3. **Run Tests**:
+   ```bash
+   ./gradlew test
+   ```
+4. **Generate OpenApi Docs**:
+   ```bash
+   ./gradlew generateOpenApiDocs
+   ```
+   
 ## Assumptions & Decisions
 - **Name Search**: Case-insensitive substring matching within words, prioritizing flexibility over strict word boundaries.
+- **Products Relationship**: Many-to-many, as products can be shared across orders (inferred from requirement to return order IDs per product).
+- **Performance**: Used JOIN FETCH for controlled loading; avoided EAGER fetching to prevent over-fetching unrelated data.
+- **Data Constraints**: No unique constraints on product descriptions to allow flexibility.
+- **Deletion**: Products remain in database even if removed from orders; cascade deletion not implemented to preserve data integrity.
+- **Pagination**: Default page size of 20; can be overridden via query parameters.
+
+## API Endpoints
+
+### Customers
+- `GET /customer` - Get all customers (paginated)
+- `GET /customer?name={substring}` - Search customers by name
+- `POST /customer` - Create a new customer
+
+### Orders
+- `GET /order` - Get all orders with products (paginated)
+- `GET /order/{id}` - Get specific order by ID
+- `POST /order` - Create a new order
+
+### Products
+- `GET /products` - Get all products with order IDs
+- `GET /products/{id}` - Get specific product with order IDs
+- `POST /products` - Create a new product
+
+## Testing the API
+Use tools like curl, Postman, or the included OpenAPI spec to test endpoints. Sample requests:
+
+```bash
+# Create a product
+curl -X POST http://localhost:8080/products \
+  -H "Content-Type: application/json" \
+  -d '{"description": "Laptop"}'
+
+# Get all products
+curl http://localhost:8080/products
+
+# Search customers
+curl "http://localhost:8080/customer?name=john"
+
+# Get order with products
+curl http://localhost:8080/order/1
+```

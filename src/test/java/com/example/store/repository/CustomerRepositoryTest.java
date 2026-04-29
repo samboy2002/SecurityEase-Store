@@ -21,7 +21,7 @@ class CustomerRepositoryTest {
     private CustomerRepository customerRepository;
 
     @Test
-    void findByNameContainingIgnoreCase() {
+    void testFindByNameContainingIgnoreCase() {
         Pageable pageable = PageRequest.of(0, 20);
 
         Page<Customer> results = customerRepository.findByNameContainingIgnoreCaseWithOrders("John", pageable);

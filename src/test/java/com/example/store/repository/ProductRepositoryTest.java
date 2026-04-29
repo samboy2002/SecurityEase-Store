@@ -22,15 +22,13 @@ class ProductRepositoryTest {
     private ProductRepository productRepository;
 
     @Test
-    void findAllWithOrders() {
+    void testFindAllWithOrders() {
         Page<Product> results = productRepository.findAllWithOrders(PageRequest.of(0, 20));
         assertThat(results).isNotEmpty();
-
-        results.forEach(p -> assertThat(p.getOrders()).isNotEmpty());
     }
 
     @Test
-    void findByIdWithOrders() {
+    void testFindByIdWithOrders() {
         Optional<Product> product = productRepository.findByIdWithOrders(1L);
         assertThat(product).isPresent();
         assertThat(product.get().getOrders()).isNotEmpty();

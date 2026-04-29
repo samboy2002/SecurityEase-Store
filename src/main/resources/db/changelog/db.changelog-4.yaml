@@ -1,46 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: 4.1-product-table
+      id: 4-product-table
       author: Dapeng Li
       changes:
-        - createTable:
-            tableName: product
-            columns:
-              - column:
-                  name: id
-                  type: bigserial
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: description
-                  type: varchar(255)
-                  constraints:
-                    nullable: false
-  - changeSet:
-      id: 4.2-order-product-joint-table
-      author: Dapeng Li
-      changes:
-        - createTable:
-            tableName: order_product
-            columns:
-              - column:
-                  name: order_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_order_product_order
-                    referencedTableName: "order"
-                    referencedColumnNames: id
-              - column:
-                  name: product_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_order_product_product
-                    referencedTableName: product
-                    referencedColumnNames: id
-        - addPrimaryKey:
-            tableName: order_product
-            columnNames: order_id, product_id
-            constraintName: pk_order_product
+        - sqlFile:
+            path: db/changelog/schema-product.sql
