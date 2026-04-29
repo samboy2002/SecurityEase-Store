@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +25,8 @@ class ProductRepositoryTest {
 
     @Test
     void findAllWithOrders() {
-        List<Product> results = productRepository.findAllWithOrders();
-        assertThat(results).isNotNull().isNotEmpty();
+        Page<Product> results = productRepository.findAllWithOrders(PageRequest.of(0, 20));
+        assertThat(results).isNotEmpty();
 
         results.forEach(p -> assertThat(p.getOrders()).isNotEmpty());
     }
