@@ -2,6 +2,10 @@ databaseChangeLog:
   - changeSet:
       id: "6-fix-sequences"
       author: "Dapeng Li"
+      preConditions:
+        - onFail: CONTINUE
+        - dbms:
+            type: postgresql
       changes:
         - sql:
             splitStatements: true
